@@ -6,11 +6,9 @@ Description: A shiny module to authenticate your R Shiny Application with Google
 License: MIT + file LICENSE
 Imports: 
     config,
+    glue,
     golem,
-    shiny (>= 1.5.0),
-    attempt,
-    DT,
-    glue
+    shiny (>= 1.5.0)
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
