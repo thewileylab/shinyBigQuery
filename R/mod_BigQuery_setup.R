@@ -1,3 +1,4 @@
+# UI ----
 #' BigQuery Module
 #'
 #' This module is designed to guide a user through the process of authenticating with Google BigQuery. It is responsible for returning an authorization token, the user selected project,the user selected dataset, and a DBI connection to a BigQuery Dataset.
@@ -34,33 +35,41 @@ bq_auth_ui <- function(id) {
 #' @export
 #' @keywords internal
 
-bq_project_auth_logic <- function(input, output, session) {
-  # Pull the namespace function from the session info to assist in updating selectInputs
-  ns <- session$ns
-  allow_nav_jscode <- 'window.onbeforeunload = null;'
+# Server ----
+bq_project_auth_logic <- function(id) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      ns <- session$ns
+      ## Allows redirect to Google for Authentication if JS configured to prevent
+      allow_nav_jscode <- 'window.onbeforeunload = null;'
+      ## BigQuery Setup Values ----
+      bigquery_setup <- reactiveValues(
+        
+      )
+      ## URL Information ----
+      protocol <- isolate(session$clientData$url_protocol)
+      hostname <- if (isolate(session$clientData$url_hostname) == '127.0.0.1') {
+        'localhost'
+      } else { isolate(session$clientData$url_hostname)
+          }
+      port <- isolate(session$clientData$url_port)
+      pathname <- isolate(session$clientData$url_pathname)
+      APP_URL <- if(is.null(port) | port == '') {
+        glue::glue('{protocol}//{hostname}{pathname}')
+        } else {
+          glue::glue('{protocol}//{hostname}:{port}{pathname}')
+          }
+      ### Extract any parameters from the URL (anything that isn't one of the things above)
+      params <- parseQueryString(isolate(session$clientData$url_search))
   
-  ## URL Information
-  protocol <- isolate(session$clientData$url_protocol)
-  hostname <- if (isolate(session$clientData$url_hostname) == '127.0.0.1') {
-    'localhost'
-  } else { isolate(session$clientData$url_hostname)
-  }
-  port <- isolate(session$clientData$url_port)
-  pathname <- isolate(session$clientData$url_pathname)
-  APP_URL <- if(is.null(port) | port == '') {
-    glue::glue('{protocol}//{hostname}{pathname}')
-  } else {
-    glue::glue('{protocol}//{hostname}:{port}{pathname}')
-  }
-  params <- parseQueryString(isolate(session$clientData$url_search))
-  # browser()
-  # if (interactive()) {
-  #   # For use locally, ensure the app is running on port 8100
-  #   APP_URL <- "http://localhost:8100/"
-  # } else {
-  #   # deployed URL (server deploymnet)
-  #   APP_URL <- "http://localhost:3838/ReviewR/"
-  # }
+      # if (interactive()) {
+      #   # For use locally, ensure the app is running on port 8100
+      #   APP_URL <- "http://localhost:8100/"
+      # } else {
+      #   # deployed URL (server deploymnet)
+      #   APP_URL <- "http://localhost:3838/ReviewR/"
+      # }
   
   # Note that secret is not really secret, and it's fine to include inline
   app <- oauth_app(
@@ -151,6 +160,8 @@ bq_project_auth_logic <- function(input, output, session) {
   )
 }
 
+)
+  }
 # BigQuery Module Dataset Auth Logic
 
 #' @rdname mod_BigQuery_module

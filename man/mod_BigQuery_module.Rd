@@ -9,7 +9,7 @@
 \usage{
 bq_auth_ui(id)
 
-bq_project_auth_logic(input, output, session)
+bq_project_auth_logic(id)
 
 bq_dataset_auth_logic(input, output, session, bq_project)
 
