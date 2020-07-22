@@ -1,5 +1,5 @@
 Package: shinyBigQuery
-Title: shinyREDCap: Access Google BigQuery through R Shiny
+Title: shinyBigQuery: Access Google BigQuery through R Shiny
 Version: 0.0.0.9000
 Authors@R: person('David', 'Mayer', email = 'david.mayer@cuanschutz.edu', role = c('cre', 'aut'))
 Description: A shiny module to authenticate your R Shiny Application with Google BigQuery.
