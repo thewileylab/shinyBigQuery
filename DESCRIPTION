@@ -1,17 +1,22 @@
 Package: shinyBigQuery
-Title: An Amazing Shiny App
+Title: shinyREDCap: Access Google BigQuery through R Shiny
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
-           role = c("aut", "cre"),
-           email = "your@email.com")
-Description: What the package does (one paragraph).
+Authors@R: person('David', 'Mayer', email = 'david.mayer@cuanschutz.edu', role = c('cre', 'aut'))
+Description: A shiny module to authenticate your R Shiny Application with Google BigQuery.
 License: MIT + file LICENSE
 Imports: 
     config,
     golem,
-    shiny
+    shiny (>= 1.5.0),
+    attempt,
+    DT,
+    glue
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
+Suggests: 
+    htmltools,
+    processx,
+    spelling,
+    testthat
+Language: en-US
