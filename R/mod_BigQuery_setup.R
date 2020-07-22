@@ -43,6 +43,7 @@ bq_project_auth_logic <- function(id) {
       ns <- session$ns
       ## Allows redirect to Google for Authentication if JS configured to prevent
       allow_nav_jscode <- 'window.onbeforeunload = null;'
+      
       ## BigQuery Setup Values ----
       bigquery_setup <- reactiveValues(
         
@@ -70,37 +71,43 @@ bq_project_auth_logic <- function(id) {
       #   # deployed URL (server deploymnet)
       #   APP_URL <- "http://localhost:3838/ReviewR/"
       # }
-  
-  # Note that secret is not really secret, and it's fine to include inline
-  app <- oauth_app(
-    appname = "ReviewR_Google_Auth",
-    key = "241672600185-vbmn82ge65skhe9gd9uihkah51eir82l.apps.googleusercontent.com",
-    ## coursera-development-admin project, currently
-    secret = "H_i96QZYXzkgKxIcCWt21VfY",
-    redirect_uri = APP_URL
-  )
-  
-  # Define Google as the endpoint (this one is canned)
-  api <- oauth_endpoints("google")
-  
-  # Always request the minimal scope needed. Here, we are requesting access to BigQuery
-  scopes <- "https://www.googleapis.com/auth/bigquery.readonly https://www.googleapis.com/auth/devstorage.read_only"
-  
-  # Craft some URL's
-  url <- oauth2.0_authorize_url(api, app, scope = scopes)
-  redirect <- sprintf("location.replace(\"%s\");", url)
-  redirect_home <- sprintf("window.location.replace(\"%s\");", APP_URL)
-  
-  # Create an authorization token and authenticate with google
-  token <- reactive({
-    req(params$code)
-    token <- oauth2.0_token(
-      app = app,
-      endpoint = api,
-      credentials = oauth2.0_access_token(api, app, params$code),
-      cache = FALSE
-    )
-  })
+      
+      ## OAuth 2.0 Client ID ----
+      secrets <- jsonlite::fromJSON(txt = system.file('extdata/OAuth_ClientID/client_secret.json', package = 'shinyBigQuery'))
+
+      ## OAuth Dance ----
+      ### You can dance if you want to. 
+      app <- oauth_app(appname = "shinyBigQuery",
+                       key = secrets$web$client_id,
+                       secret = secrets$web$client_secret,
+                       redirect_uri = APP_URL
+                       )
+      
+      ### Define Google as the endpoint (this one is canned)
+      api <- oauth_endpoints("google")
+      
+      ### Always request the minimal scope needed. Here, we are requesting:
+      ### - read only access to BigQuery
+      ### - read only access to storage api (required to run queries)
+      ### - view your email address
+      ### - See your personal info, including any personal info you've made publicly available
+      scopes <- "https://www.googleapis.com/auth/bigquery.readonly https://www.googleapis.com/auth/devstorage.read_only https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+      
+      ### Craft some URL's
+      url <- oauth2.0_authorize_url(api, app, scope = scopes)
+      redirect <- sprintf("location.replace(\"%s\");", url)
+      redirect_home <- sprintf("window.location.replace(\"%s\");", APP_URL)
+      
+      ### Create an authorization token and authenticate with google
+      token <- reactive({
+        req(params$code)
+        token <- oauth2.0_token(
+          app = app,
+          endpoint = api,
+          credentials = oauth2.0_access_token(api, app, params$code),
+          cache = FALSE
+          )
+        })
   
   # Create choices for project/dataset selectInputs
   available_projects <- reactive({
