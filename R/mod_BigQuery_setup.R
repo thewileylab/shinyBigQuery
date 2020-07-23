@@ -45,15 +45,17 @@ bigquery_setup_ui <- function(id) {
 #'
 #' @importFrom bigrquery bq_auth bq_projects bq_project_datasets bigquery dbDisconnect
 #' @importFrom DBI dbConnect
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter pull
 #' @importFrom gargle token_userinfo
 #' @importFrom glue glue
 #' @importFrom httr oauth_app oauth_endpoints oauth2.0_authorize_url oauth2.0_token oauth2.0_access_token
 #' @importFrom jsonlite fromJSON
 #' @importFrom magrittr %>% 
+#' @importFrom purrr flatten
 #' @importFrom shinyjs runjs
 #' @importFrom shinydashboardPlus widgetUserBox
-#' @importFrom tibble tibble deframe
+#' @importFrom tibble tibble enframe
+#' @importFrom tidyr unnest
 #' 
 bigquery_setup_server <- function(id) {
   moduleServer(
@@ -149,7 +151,6 @@ bigquery_setup_server <- function(id) {
           shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
                                             subtitle = bigquery_setup$user_info$email,
                                             src = bigquery_setup$user_info$picture,
-                                            # width = '100%',
                                             type = 2, 
                                             color = 'primary',
                                             collapsible = FALSE,
@@ -162,11 +163,32 @@ bigquery_setup_server <- function(id) {
                                             selectInput(inputId = ns('bq_project_id'),
                                                         label = 'Select from Available Google Projects:',
                                                         choices = bigquery_setup$bq_projects
-                                                        )
+                                                        ),
+                                            selectizeInput(inputId = ns('bq_dataset_id'),
+                                                           label = 'Select from Available BigQuery Datasets:',
+                                                           choices = NULL)
                                             )
         )
       })
       
+      observeEvent(input$bq_project_id, {
+        req(input$bq_project_id)
+        bigquery_setup$bq_project <- input$bq_project_id
+        dataset_choices <- bigrquery::bq_project_datasets(bigquery_setup$bq_project) %>% 
+          purrr::flatten() %>% 
+          tibble::enframe() %>% 
+          dplyr::filter(.data$name == 'dataset') %>% 
+          tidyr::unnest(.data$value) %>% 
+          dplyr::pull(.data$value)
+        # browser()
+        updateSelectizeInput(session = session,
+                             inputId = 'bq_dataset_id',
+                             choices = dataset_choices,
+                             server = T,
+                             options = list(create = FALSE,
+                                            placeholder = 'Please Select A Project')
+                             )
+      })
       # BigQuery Setup Outputs ----
       output$bq_authenticated_ui <- renderUI({ google_connected_ui() })
       
