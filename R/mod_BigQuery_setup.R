@@ -147,6 +147,7 @@ bigquery_setup_server <- function(id) {
         })
       google_connected_ui <- reactive({
         req(bigquery_setup$user_info)
+        
         tagList(
           shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
                                             subtitle = bigquery_setup$user_info$email,
@@ -161,12 +162,13 @@ bigquery_setup_server <- function(id) {
                                                          icon = icon(name = 'sign-out-alt')
                                                          ),
                                             selectInput(inputId = ns('bq_project_id'),
-                                                        label = 'Select from Available Google Projects:',
-                                                        choices = bigquery_setup$bq_projects
-                                                        ),
+                                                           label = 'Select from Available Google Projects:',
+                                                           choices = bigquery_setup$bq_projects
+                                                           ),
                                             selectizeInput(inputId = ns('bq_dataset_id'),
                                                            label = 'Select from Available BigQuery Datasets:',
-                                                           choices = NULL)
+                                                           choices = NULL
+                                                           )
                                             )
         )
       })
@@ -174,11 +176,11 @@ bigquery_setup_server <- function(id) {
       observeEvent(input$bq_project_id, {
         req(input$bq_project_id)
         bigquery_setup$bq_project <- input$bq_project_id
-        dataset_choices <- bigrquery::bq_project_datasets(bigquery_setup$bq_project) %>% 
-          purrr::flatten() %>% 
-          tibble::enframe() %>% 
-          dplyr::filter(.data$name == 'dataset') %>% 
-          tidyr::unnest(.data$value) %>% 
+        dataset_choices <- bigrquery::bq_project_datasets(bigquery_setup$bq_project) %>%
+          purrr::flatten() %>%
+          tibble::enframe() %>%
+          dplyr::filter(.data$name == 'dataset') %>%
+          tidyr::unnest(.data$value) %>%
           dplyr::pull(.data$value)
         # browser()
         updateSelectizeInput(session = session,
@@ -186,9 +188,10 @@ bigquery_setup_server <- function(id) {
                              choices = dataset_choices,
                              server = T,
                              options = list(create = FALSE,
-                                            placeholder = 'Please Select A Project')
+                                            placeholder = 'Please ensure you have access to a BigQuery dataset in this project.')
                              )
       })
+      
       # BigQuery Setup Outputs ----
       output$bq_authenticated_ui <- renderUI({ google_connected_ui() })
       
