@@ -9,15 +9,21 @@ Imports:
     config,
     DBI,
     dplyr,
+    gargle,
     glue,
     golem,
     httr,
+    jsonlite,
     magrittr,
     purrr,
     rlang,
     shiny (>= 1.5.0),
     tibble,
-    tidyr
+    tidyr,
+    shinydashboard,
+    shinydashboardPlus,
+    shinyjs,
+    shinyWidgets
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1

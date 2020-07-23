@@ -8,13 +8,32 @@
 #' @return The BigQuery Setup UI
 #' @export
 #' 
+#' @importFrom shinydashboard box
+#' @importFrom shinyjs hidden
 bigquery_setup_ui <- function(id) {
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
-    uiOutput(ns('bq_connect_project_ui'))
-  )
-}
+    div(id = ns('google_connect_div'),
+      shinydashboard::box(title = 'Connect to BigQuery',
+                          width = '100%',
+                          status = 'primary',
+                          solidHeader = F,
+                          HTML('To connect to Google BigQuery, please sign in with your Google Account.'),
+                          br(),
+                          actionButton(inputId = ns('login'),
+                                       label = 'Sign In with Google',
+                                       icon = icon(name = 'google')
+                                       )
+                          )
+      ),
+    shinyjs::hidden(
+      div(id = ns('google_authenticated_div'),
+          uiOutput(ns('bq_authenticated_ui'))
+          )
+      )
+    )
+  }
 
 # Server ----
 #' BigQuery Setup Server
@@ -24,14 +43,17 @@ bigquery_setup_ui <- function(id) {
 #' @return BigQuery connection variables and user information
 #' @export
 #'
-#' @importFrom shiny NS tagList parseQueryString isolate
-#' @importFrom httr oauth_app oauth_endpoints oauth2.0_authorize_url oauth2.0_token oauth2.0_access_token
 #' @importFrom bigrquery bq_auth bq_projects bq_project_datasets bigquery dbDisconnect
-#' @importFrom tibble tibble deframe
-#' @importFrom dplyr filter
-#' @importFrom magrittr %>% 
 #' @importFrom DBI dbConnect
+#' @importFrom dplyr filter
+#' @importFrom gargle token_userinfo
 #' @importFrom glue glue
+#' @importFrom httr oauth_app oauth_endpoints oauth2.0_authorize_url oauth2.0_token oauth2.0_access_token
+#' @importFrom jsonlite fromJSON
+#' @importFrom magrittr %>% 
+#' @importFrom shinyjs runjs
+#' @importFrom shinydashboardPlus widgetUserBox
+#' @importFrom tibble tibble deframe
 #' 
 bigquery_setup_server <- function(id) {
   moduleServer(
@@ -43,7 +65,8 @@ bigquery_setup_server <- function(id) {
       
       ## BigQuery Setup Values ----
       bigquery_setup <- reactiveValues(
-        app_url = NULL
+        user_info = NULL,
+        bq_projects = NULL
         )
       
       ## Client URL Information ----
@@ -88,68 +111,67 @@ bigquery_setup_server <- function(id) {
       redirect_home <- sprintf("window.location.replace(\"%s\");", client_url)
       
       # Define the reactive BQ Setup UI ----
-      bq_setup_ui <- reactive({
-        if (is.null(params$code)) {
-          tagList(
-            # Create an action button to redirect to Google, ask nicely if we can use BigQuery
-            actionButton(inputId = 'login',
-                         label = 'Sign In with Google',
-                         icon = icon(name = 'google'),
-                         #### We can leave this app behind
-                         onclick = HTML(allow_nav_jscode, redirect)
-                         )
-            )
-          } else {
-          # Create a UI offering a disconnect or selecting a project and dataset.
-            tagList(
-              HTML("You have authenticated with Google BigQuery. Please select from the list of available projects, or sign out and sign in with a different Google Account."),
-              br(),
-              # Create an action button to redirect to application home, which will clear any access tokens
-              actionButton(inputId = 'logout',
-                           label = 'Sign Out of Google',
-                           icon = icon(name = 'sign-out-alt'),
-                           onclick = HTML(allow_nav_jscode, redirect_home)
-                           ),
-              ## Otherwise, walk the user through selecting a project using reactive selectInput
-              select_project_ui()
-              )
-            }
-        })
       
-      ### Create an authorization token and authenticate with google
+      observeEvent(input$login, ignoreInit = T, {
+        #### We can leave this app behind
+        shinyjs::runjs( HTML(allow_nav_jscode, redirect) )
+        })
+
+      observeEvent(input$logout, {
+        shinyjs::runjs( HTML(allow_nav_jscode, redirect_home) )
+        shinyjs::hide(id = 'google_authenticated_div')
+        shinyjs::show(id = 'google_connect_div')
+      })
+      
+      ### Create an authorization token and authenticate with Google
       #### But when we come back, we'll run oauth2.0_token()
       observe({
         if(is.null(params$code)) {
           bigrquery::bq_deauth()
           } else { 
+            shinyjs::hide(id = 'google_connect_div')
+            shinyjs::show(id = 'google_authenticated_div')
             token <- oauth2.0_token(app = app,
                                     endpoint = api,
                                     credentials = oauth2.0_access_token(api, app, params$code),
                                     cache = FALSE
                                     )
             #### And authenticate the UI
-            bigrquery::bq_auth(token)
+            bigrquery::bq_auth(token = token)
+            bigquery_setup$user_info <- gargle::token_userinfo(token = token)
             bigquery_setup$bq_projects <- bigrquery::bq_projects()
+            # browser()
           }
         })
+      google_connected_ui <- reactive({
+        req(bigquery_setup$user_info)
+        tagList(
+          shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
+                                            subtitle = bigquery_setup$user_info$email,
+                                            src = bigquery_setup$user_info$picture,
+                                            # width = '100%',
+                                            type = 2, 
+                                            color = 'primary',
+                                            collapsible = FALSE,
+                                            HTML("You have authenticated with Google BigQuery. Please select from the list of available projects, or sign out and sign in with a different Google Account."),
+                                            br(),
+                                            actionButton(inputId = ns('logout'),
+                                                         label = 'Sign Out of Google',
+                                                         icon = icon(name = 'sign-out-alt')
+                                                         ),
+                                            selectInput(inputId = ns('bq_project_id'),
+                                                        label = 'Select from Available Google Projects:',
+                                                        choices = bigquery_setup$bq_projects
+                                                        )
+                                            )
+        )
+      })
       
-      # Create project/dataset selectInputs, using the namespace function extracted from the session info
-      select_project_ui <- reactive({
-        req(bigquery_setup$bq_projects)
-        selectInput(inputId = ns('bq_project_id'),
-                    label = 'Select from Available Google Projects:',
-                    choices = bigquery_setup$bq_projects)
-        })
+      # BigQuery Setup Outputs ----
+      output$bq_authenticated_ui <- renderUI({ google_connected_ui() })
       
-      # Collect the user inputs to pass to other elements of the application
-      bq_project <- reactive({input$bq_project_id})
-      
-      # Create the output UI
-      output$bq_connect_project_ui <- renderUI({ bq_setup_ui() })
-      
-      # Also Return a list of objects for use in other parts of the app. Keep the dataset separate so that bigrquery joins can be performed across datasets.
+      # Return Setup Values. Keep the dataset separate so that bigrquery joins can be performed across datasets.
       return(bigquery_setup)
-      
       }
     )
   }
