@@ -6,5 +6,5 @@
 #' @noRd
 app_server <- function( input, output, session ) {
   # List the first level callModules here
-
+  setup_vars <- bigquery_setup_server(id = 'bq_setup')
 }

@@ -6,11 +6,10 @@
 #' @noRd
 app_ui <- function(request) {
   tagList(
-    # Leave this function for adding external resources
-    golem_add_external_resources(),
     # List the first level UI elements here 
     fluidPage(
-      h1("shinyBigQuery")
+      h1("shinyBigQuery"),
+      bigquery_setup_ui('bq_setup')
     )
   )
 }
@@ -22,6 +21,7 @@ app_ui <- function(request) {
 #' 
 #' @import shiny
 #' @importFrom golem add_resource_path activate_js favicon bundle_resources
+#' @importFrom shinyjs useShinyjs
 #' @noRd
 golem_add_external_resources <- function(){
   
@@ -34,9 +34,10 @@ golem_add_external_resources <- function(){
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'shinyBigQuery'
-    )
+    ),
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
+    shinyjs::useShinyjs()
   )
 }
 
