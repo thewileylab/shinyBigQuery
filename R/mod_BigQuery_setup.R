@@ -68,7 +68,10 @@ bigquery_setup_server <- function(id) {
       ## BigQuery Setup Values ----
       bigquery_setup <- reactiveValues(
         user_info = NULL,
-        bq_projects = NULL
+        bq_projects = NULL,
+        bq_project_id = NULL,
+        bq_dataset_id = NULL,
+        db_con = NULL
         )
       
       ## Client URL Information ----
@@ -162,14 +165,21 @@ bigquery_setup_server <- function(id) {
                                                          label = 'Sign Out of Google',
                                                          icon = icon(name = 'sign-out-alt')
                                                          ),
-                                            selectInput(inputId = ns('bq_project_id'),
+                                            selectizeInput(inputId = ns('bq_project_id'),
                                                            label = 'Select from Available Google Projects:',
-                                                           choices = bigquery_setup$bq_projects
+                                                           choices = bigquery_setup$bq_projects,
+                                                           options = list(create = FALSE,
+                                                                          placeholder = 'No Available Projects')
                                                            ),
                                             selectizeInput(inputId = ns('bq_dataset_id'),
                                                            label = 'Select from Available BigQuery Datasets:',
                                                            choices = NULL
-                                                           )
+                                                           ),
+                                            shinyjs::hidden(
+                                              div(id = ns('bq_connect_div'),
+                                                actionButton(inputId = ns('bq_connect'),label = 'Connect',icon = icon('cloud'))
+                                                )
+                                              )
                                             )
         )
       })
@@ -177,8 +187,7 @@ bigquery_setup_server <- function(id) {
       ### When the user selects a GCP Project, populate the available dataset selector choices. 
       observeEvent(input$bq_project_id, {
         req(input$bq_project_id)
-        bigquery_setup$bq_project <- input$bq_project_id
-        dataset_choices <- bigrquery::bq_project_datasets(bigquery_setup$bq_project) %>%
+        dataset_choices <- bigrquery::bq_project_datasets(input$bq_project_id) %>%
           purrr::flatten() %>%
           tibble::enframe() %>%
           dplyr::filter(.data$name == 'dataset') %>%
@@ -192,7 +201,22 @@ bigquery_setup_server <- function(id) {
                              options = list(create = FALSE,
                                             placeholder = 'Please ensure you have access to a BigQuery dataset in this project.')
                              )
-      })
+        })
+      
+      ### When the user selects an available dataset, show the 'connect' button
+      observeEvent(input$bq_dataset_id, {
+        req(input$bq_dataset_id)
+        shinyjs::show(id = 'bq_connect_div')
+        })
+      
+      ### Store configured values as a connection object
+      observeEvent(input$bq_connect, {
+        bigquery_setup$bq_project_id <- input$bq_project_id
+        bigquery_setup$bq_dataset_id <- input$bq_dataset_id
+        bigquery_setup$db_con <- DBI::dbConnect(drv = bigquery(),
+                                                project = bigquery_setup$bq_project,
+                                                dataset = bigquery_setup$bq_dataset_id)
+        })
       
       ## BigQuery Setup Outputs ----
       output$bq_authenticated_ui <- renderUI({ google_connected_ui() })
