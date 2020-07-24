@@ -52,6 +52,7 @@ bigquery_setup_ui <- function(id) {
 #' @importFrom jsonlite fromJSON
 #' @importFrom magrittr %>% 
 #' @importFrom purrr flatten
+#' @importFrom rlang .data
 #' @importFrom shinyjs runjs
 #' @importFrom shinydashboardPlus widgetUserBox
 #' @importFrom tibble tibble enframe
@@ -214,7 +215,7 @@ bigquery_setup_server <- function(id) {
         bigquery_setup$bq_project_id <- input$bq_project_id
         bigquery_setup$bq_dataset_id <- input$bq_dataset_id
         bigquery_setup$db_con <- DBI::dbConnect(drv = bigquery(),
-                                                project = bigquery_setup$bq_project,
+                                                project = bigquery_setup$bq_project_id,
                                                 dataset = bigquery_setup$bq_dataset_id)
         })
       

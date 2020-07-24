@@ -18,12 +18,12 @@ Imports:
     purrr,
     rlang,
     shiny (>= 1.5.0),
-    tibble,
-    tidyr,
     shinydashboard,
     shinydashboardPlus,
     shinyjs,
-    shinyWidgets
+    shinyWidgets,
+    tibble,
+    tidyr
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
