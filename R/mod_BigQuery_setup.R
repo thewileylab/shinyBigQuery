@@ -112,20 +112,20 @@ bigquery_setup_server <- function(id) {
       redirect <- sprintf("location.replace(\"%s\");", google_auth_url)
       redirect_home <- sprintf("window.location.replace(\"%s\");", client_url)
       
-      # Define the reactive BQ Setup UI ----
-      
+      ### When the login button is pressed, redirect to Google for authentication
       observeEvent(input$login, ignoreInit = T, {
         #### We can leave this app behind
         shinyjs::runjs( HTML(allow_nav_jscode, redirect) )
         })
-
+      
+      ### When the disconnect button is pressed, reset the UI by redirecting to the base url, minus the authorization code
       observeEvent(input$logout, {
         shinyjs::runjs( HTML(allow_nav_jscode, redirect_home) )
         shinyjs::hide(id = 'google_authenticated_div')
         shinyjs::show(id = 'google_connect_div')
       })
       
-      ### Create an authorization token and authenticate with Google
+      ### Create an oauth2.0 token and authenticate with Google, when authorization code is present in client URL. De-authenticate when not present.
       #### But when we come back, we'll run oauth2.0_token()
       observe({
         if(is.null(params$code)) {
@@ -145,9 +145,10 @@ bigquery_setup_server <- function(id) {
             # browser()
           }
         })
+      
+      ## Define the reactive BQ Setup UI ----
       google_connected_ui <- reactive({
         req(bigquery_setup$user_info)
-        
         tagList(
           shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
                                             subtitle = bigquery_setup$user_info$email,
@@ -173,6 +174,7 @@ bigquery_setup_server <- function(id) {
         )
       })
       
+      ### When the user selects a GCP Project, populate the available dataset selector choices. 
       observeEvent(input$bq_project_id, {
         req(input$bq_project_id)
         bigquery_setup$bq_project <- input$bq_project_id
@@ -192,10 +194,10 @@ bigquery_setup_server <- function(id) {
                              )
       })
       
-      # BigQuery Setup Outputs ----
+      ## BigQuery Setup Outputs ----
       output$bq_authenticated_ui <- renderUI({ google_connected_ui() })
       
-      # Return Setup Values. Keep the dataset separate so that bigrquery joins can be performed across datasets.
+      # Return Setup Values ----
       return(bigquery_setup)
       }
     )
