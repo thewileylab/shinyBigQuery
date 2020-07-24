@@ -5,18 +5,18 @@ Authors@R: person('David', 'Mayer', email = 'david.mayer@cuanschutz.edu', role =
 Description: A shiny module to authenticate your R Shiny Application with Google BigQuery.
 License: MIT + file LICENSE
 Imports:
-    bigrquery,
+    bigrquery (>= 1.2.0),
     config,
     DBI,
     dplyr,
     gargle,
     glue,
-    golem,
+    golem (>= 0.2.1.90),
     httr,
     jsonlite,
     magrittr,
     purrr,
-    rlang,
+    rlang (>= 0.4.7),
     shiny (>= 1.5.0),
     shinydashboard,
     shinydashboardPlus,
@@ -24,6 +24,7 @@ Imports:
     shinyWidgets,
     tibble,
     tidyr
+Remotes: Thinkr-open/golem
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
