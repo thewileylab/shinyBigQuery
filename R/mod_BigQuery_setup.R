@@ -72,7 +72,8 @@ bigquery_setup_server <- function(id) {
         bq_projects = NULL,
         bq_project_id = NULL,
         bq_dataset_id = NULL,
-        db_con = NULL
+        db_con = NULL,
+        is_connected = NULL
         )
       
       ## Client URL Information ----
@@ -217,6 +218,7 @@ bigquery_setup_server <- function(id) {
         bigquery_setup$db_con <- DBI::dbConnect(drv = bigquery(),
                                                 project = bigquery_setup$bq_project_id,
                                                 dataset = bigquery_setup$bq_dataset_id)
+        bigquery_setup$is_connected <- 'yes'
         })
       
       ## BigQuery Setup Outputs ----
