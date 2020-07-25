@@ -10,6 +10,7 @@
 #' 
 #' @importFrom shinydashboard box
 #' @importFrom shinyjs hidden
+#' @importFrom shinycssloaders withSpinner
 bigquery_setup_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -29,7 +30,7 @@ bigquery_setup_ui <- function(id) {
       ),
     shinyjs::hidden(
       div(id = ns('google_authenticated_div'),
-          uiOutput(ns('bq_authenticated_ui'))
+          uiOutput(ns('bq_authenticated_ui')) %>% shinycssloaders::withSpinner()
           )
       )
     )
@@ -55,6 +56,7 @@ bigquery_setup_ui <- function(id) {
 #' @importFrom rlang .data
 #' @importFrom shinyjs runjs
 #' @importFrom shinydashboardPlus widgetUserBox
+#' @importFrom shinyWidgets actionBttn
 #' @importFrom tibble tibble enframe
 #' @importFrom tidyr unnest
 #' 
@@ -152,7 +154,7 @@ bigquery_setup_server <- function(id) {
         })
       
       ## Define the reactive BQ Setup UI ----
-      google_connected_ui <- reactive({
+      google_authenticated_ui <- reactive({
         req(bigquery_setup$user_info)
         tagList(
           shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
@@ -163,10 +165,6 @@ bigquery_setup_server <- function(id) {
                                             collapsible = FALSE,
                                             HTML("You have authenticated with Google BigQuery. Please select from the list of available projects, or sign out and sign in with a different Google Account."),
                                             br(),
-                                            actionButton(inputId = ns('logout'),
-                                                         label = 'Sign Out of Google',
-                                                         icon = icon(name = 'sign-out-alt')
-                                                         ),
                                             selectizeInput(inputId = ns('bq_project_id'),
                                                            label = 'Select from Available Google Projects:',
                                                            choices = bigquery_setup$bq_projects,
@@ -181,9 +179,18 @@ bigquery_setup_server <- function(id) {
                                               div(id = ns('bq_connect_div'),
                                                 actionButton(inputId = ns('bq_connect'),label = 'Connect',icon = icon('cloud'))
                                                 )
+                                              ),
+                                            footer = fluidRow(
+                                              div(actionBttn(inputId = ns('logout'),
+                                                             label = 'Sign Out of Google',
+                                                             style = 'jelly',
+                                                             icon = icon(name = 'sign-out-alt')
+                                                             ),
+                                                  style="float:right"
+                                                  )
                                               )
                                             )
-        )
+          )
       })
       
       ### When the user selects a GCP Project, populate the available dataset selector choices. 
@@ -221,8 +228,12 @@ bigquery_setup_server <- function(id) {
         bigquery_setup$is_connected <- 'yes'
         })
       
+      google_configured_ui <- reactive({
+        
+      })
+      
       ## BigQuery Setup Outputs ----
-      output$bq_authenticated_ui <- renderUI({ google_connected_ui() })
+      output$bq_authenticated_ui <- renderUI({ google_authenticated_ui() })
       
       # Return Setup Values ----
       return(bigquery_setup)
