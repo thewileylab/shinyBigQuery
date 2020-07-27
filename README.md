@@ -34,8 +34,9 @@ shinyBigQuery::run_app()
 
 To integrate shinyBigQuery with your Shiny application place
 `bigquery_setup_ui()` and `bigquery_setup_server()` functions into your
-applications ui and server functions respectively. An example is given
-below:
+applications ui and server functions respectively. Note, as Google relys
+on OAuth 2.0 authentication, this application must run on port 8100 in a
+browser. An example is given below:
 
 ``` r
 library(shiny)
@@ -50,7 +51,7 @@ server <- function(input, output, session) {
 }
 
 if (interactive())
-  shinyApp(ui = ui, server = server)
+  shinyApp(ui = ui, server = server, options = list(port = 8100, launch.browser = T))
 ```
 
 ## Code of Conduct
