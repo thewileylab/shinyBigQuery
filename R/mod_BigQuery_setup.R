@@ -273,6 +273,15 @@ bigquery_setup_server <- function(id) {
           )
         })
       
+      observeEvent(input$disconnect, {
+        bigquery_setup$bq_project_id <- NULL
+        bigquery_setup$bq_dataset_id <- NULL
+        bigquery_setup$db_con <- NULL
+        bigquery_setup$is_connected <- 'no'
+        shinyjs::hide('google_configured_div')
+        shinyjs::show('google_authenticated_div')
+      })
+      
       ## BigQuery Setup Outputs ----
       output$google_authenticated_ui <- renderUI({ google_authenticated_ui() })
       output$google_configured_ui <- renderUI({ google_configured_ui() })
