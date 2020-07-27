@@ -20,7 +20,7 @@ bigquery_setup_ui <- function(id) {
                           width = '100%',
                           status = 'primary',
                           solidHeader = F,
-                          HTML('To connect to Google BigQuery, please sign in with your Google Account.'),
+                          HTML('To connect to Google BigQuery, please sign in with your Google Account.<br><br>'),
                           br(),
                           actionButton(inputId = ns('login'),
                                        label = 'Sign In with Google',
@@ -30,7 +30,10 @@ bigquery_setup_ui <- function(id) {
       ),
     shinyjs::hidden(
       div(id = ns('google_authenticated_div'),
-          uiOutput(ns('bq_authenticated_ui')) %>% shinycssloaders::withSpinner()
+          uiOutput(ns('google_authenticated_ui')) %>% shinycssloaders::withSpinner()
+          ),
+      div(id = ns('google_configured_div'),
+          uiOutput(ns('google_configured_ui')) %>% shinycssloaders::withSpinner()
           )
       )
     )
@@ -163,7 +166,7 @@ bigquery_setup_server <- function(id) {
                                             type = 2, 
                                             color = 'primary',
                                             collapsible = FALSE,
-                                            HTML("You have authenticated with Google BigQuery. Please select from the list of available projects, or sign out and sign in with a different Google Account."),
+                                            HTML(glue::glue('{bigquery_setup$user_info$given_name}, you have successfully authenticated with Google BigQuery. Please select a dataset from from the list of available projects, or sign out and sign in with a different Google Account.<br><br>')),
                                             br(),
                                             selectizeInput(inputId = ns('bq_project_id'),
                                                            label = 'Select from Available Google Projects:',
@@ -224,16 +227,40 @@ bigquery_setup_server <- function(id) {
         bigquery_setup$bq_dataset_id <- input$bq_dataset_id
         bigquery_setup$db_con <- DBI::dbConnect(drv = bigquery(),
                                                 project = bigquery_setup$bq_project_id,
-                                                dataset = bigquery_setup$bq_dataset_id)
+                                                dataset = bigquery_setup$bq_dataset_id
+                                                )
         bigquery_setup$is_connected <- 'yes'
+        shinyjs::hide('google_authenticated_div')
+        shinyjs::show('google_configured_div')
         })
       
       google_configured_ui <- reactive({
-        
-      })
+        req(bigquery_setup$is_connected == 'yes')
+        tagList(
+          shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
+                                            subtitle = bigquery_setup$user_info$email,
+                                            src = bigquery_setup$user_info$picture,
+                                            type = 2, 
+                                            color = 'primary',
+                                            collapsible = FALSE,
+                                            HTML('You have connected<br>'),
+                                            actionButton(inputId = ns('disconnect'),label = 'Disconnect'),
+                                            footer = fluidRow(
+                                              div(actionBttn(inputId = ns('logout_2'),
+                                                             label = 'Sign Out of Google',
+                                                             style = 'jelly',
+                                                             icon = icon(name = 'sign-out-alt')
+                                                             ),
+                                                  style="float:right"
+                                                  )
+                                              )
+                                            )
+          )
+        })
       
       ## BigQuery Setup Outputs ----
-      output$bq_authenticated_ui <- renderUI({ google_authenticated_ui() })
+      output$google_authenticated_ui <- renderUI({ google_authenticated_ui() })
+      output$google_configured_ui <- renderUI({ google_configured_ui() })
       
       # Return Setup Values ----
       return(bigquery_setup)
