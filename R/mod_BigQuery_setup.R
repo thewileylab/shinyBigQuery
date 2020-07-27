@@ -78,7 +78,7 @@ bigquery_setup_server <- function(id) {
         bq_project_id = NULL,
         bq_dataset_id = NULL,
         db_con = NULL,
-        is_connected = NULL
+        is_connected = 'no'
         )
       
       ## Client URL Information ----
@@ -130,6 +130,11 @@ bigquery_setup_server <- function(id) {
       
       ### When the disconnect button is pressed, reset the UI by redirecting to the base url, minus the authorization code
       observeEvent(input$logout, {
+        shinyjs::runjs( HTML(allow_nav_jscode, redirect_home) )
+        shinyjs::hide(id = 'google_authenticated_div')
+        shinyjs::show(id = 'google_connect_div')
+      })
+      observeEvent(input$logout_2, {
         shinyjs::runjs( HTML(allow_nav_jscode, redirect_home) )
         shinyjs::hide(id = 'google_authenticated_div')
         shinyjs::show(id = 'google_connect_div')
@@ -243,7 +248,17 @@ bigquery_setup_server <- function(id) {
                                             type = 2, 
                                             color = 'primary',
                                             collapsible = FALSE,
-                                            HTML('You have connected<br>'),
+                                            HTML(paste('<H3>Success!!</H3>',
+                                                       'You have connected to a Google BigQuery database.',
+                                                       '<br>',
+                                                       '<br>',
+                                                       '<H4>Connection Information:</H4>',
+                                                       '<b>Project:</b>', bigquery_setup$bq_project_id,
+                                                       '<br>',
+                                                       '<b>Dataset:</b>', bigquery_setup$bq_dataset_id,
+                                                       '<br>'
+                                                       )
+                                                 ),
                                             actionButton(inputId = ns('disconnect'),label = 'Disconnect'),
                                             footer = fluidRow(
                                               div(actionBttn(inputId = ns('logout_2'),
