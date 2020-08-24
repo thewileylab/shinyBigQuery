@@ -73,6 +73,10 @@ bigquery_setup_server <- function(id) {
       
       ## BigQuery Setup Values ----
       bigquery_setup <- reactiveValues(
+        ### Module Info
+        moduleName = 'BigQuery',
+        moduleType = 'database',
+        ### Connection Variables
         user_info = NULL,
         bq_projects = NULL,
         bq_project_id = NULL,
