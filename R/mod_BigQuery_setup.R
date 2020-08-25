@@ -76,6 +76,7 @@ bigquery_setup_server <- function(id) {
         ### Module Info
         moduleName = 'BigQuery',
         moduleType = 'database',
+        ui = shinyBigQuery::bigquery_setup_ui(id),
         ### Connection Variables
         user_info = NULL,
         bq_projects = NULL,
