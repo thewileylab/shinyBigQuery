@@ -15,6 +15,7 @@ bigquery_setup_ui <- function(id) {
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
+    uiOutput(ns('token_info')),
     div(id = ns('google_connect_div'),
       shinydashboard::box(title = 'Connect to BigQuery',
                           width = '100%',
@@ -85,6 +86,9 @@ bigquery_setup_server <- function(id) {
         db_con = NULL,
         is_connected = 'no'
         )
+      google_info <- reactiveValues(
+        is_authorized = 'no'
+      )
       
       ## Client URL Information ----
       protocol <- isolate(session$clientData$url_protocol)
@@ -100,8 +104,15 @@ bigquery_setup_server <- function(id) {
           glue::glue('{protocol}//{hostname}:{port}{pathname}')
           }
       ### Extract any parameters from the URL (anything that isn't one of the things above)
-      params <- parseQueryString(isolate(session$clientData$url_search))
-
+      params <- reactive({ parseQueryString(isolate(session$clientData$url_search)) })
+      observeEvent(params(), {
+        if(is.null(params()$code)) {
+          google_info$is_authorized <- 'no' 
+        } else {
+            google_info$is_authorized <- 'yes'
+          }
+      })
+      
       ## OAuth Dance ----
       #### We can dance if we want to
       ### OAuth 2.0 Client ID
@@ -147,17 +158,18 @@ bigquery_setup_server <- function(id) {
       
       ### Create an oauth2.0 token and authenticate with Google, when authorization code is present in client URL. De-authenticate when not present.
       #### But when we come back, we'll run oauth2.0_token()
-      observe({
-        if(is.null(params$code)) {
+      observeEvent(google_info$is_authorized, {
+        if(google_info$is_authorized == 'no') {
           bigrquery::bq_deauth()
           } else { 
-            shinyjs::hide(id = 'google_connect_div')
-            shinyjs::show(id = 'google_authenticated_div')
+            # shinyjs::hide(id = 'google_connect_div')
+            # shinyjs::show(id = 'google_authenticated_div')
             token <- oauth2.0_token(app = app,
                                     endpoint = api,
-                                    credentials = oauth2.0_access_token(api, app, params$code),
+                                    credentials = oauth2.0_access_token(api, app, params()$code),
                                     cache = FALSE
                                     )
+            google_info$token <- token
             #### And authenticate the UI
             bigrquery::bq_auth(token = token)
             bigquery_setup$user_info <- gargle::token_userinfo(token = token)
@@ -166,6 +178,12 @@ bigquery_setup_server <- function(id) {
           }
         })
       
+      observeEvent(bigquery_setup$user_info, {
+        req(bigquery_setup$user_info)
+        shinyjs::hide(id = 'google_connect_div')
+        shinyjs::show(id = 'google_authenticated_div')
+      })
+      output$token_info <- renderPrint(google_info$token)
       ## Define the reactive BQ Setup UI ----
       google_authenticated_ui <- reactive({
         req(bigquery_setup$user_info)
