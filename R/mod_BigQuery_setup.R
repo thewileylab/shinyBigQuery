@@ -58,7 +58,7 @@ bigquery_setup_ui <- function(id) {
 #' @importFrom magrittr %>% 
 #' @importFrom purrr flatten
 #' @importFrom rlang .data
-#' @importFrom shinyjs runjs
+#' @importFrom shinyjs runjs show hide
 #' @importFrom shinydashboardPlus widgetUserBox
 #' @importFrom shinyWidgets actionBttn
 #' @importFrom tibble tibble enframe
