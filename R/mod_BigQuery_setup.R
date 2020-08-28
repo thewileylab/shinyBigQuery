@@ -15,24 +15,10 @@ bigquery_setup_ui <- function(id) {
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
-    # uiOutput(ns('token_info')), ## Debug
     div(id = ns('google_connect_div'),
-      shinydashboard::box(title = 'Connect to BigQuery',
-                          width = '100%',
-                          status = 'primary',
-                          solidHeader = F,
-                          HTML('To connect to Google BigQuery, please sign in with your Google Account.<br><br>'),
-                          br(),
-                          actionButton(inputId = ns('login'),
-                                       label = 'Sign In with Google',
-                                       icon = icon(name = 'google')
-                                       )
-                          )
-      ),
+        uiOutput(ns('google_connect_ui')) %>% shinycssloaders::withSpinner()
+    ),
     shinyjs::hidden(
-      div(id = ns('google_authenticated_div'),
-          uiOutput(ns('google_authenticated_ui')) %>% shinycssloaders::withSpinner()
-          ),
       div(id = ns('google_configured_div'),
           uiOutput(ns('google_configured_ui')) %>% shinycssloaders::withSpinner()
           )
@@ -147,12 +133,12 @@ bigquery_setup_server <- function(id) {
       ### When the disconnect button is pressed, reset the UI by redirecting to the base url, minus the authorization code
       observeEvent(input$logout, {
         shinyjs::runjs( HTML(allow_nav_jscode, redirect_home) )
-        shinyjs::hide(id = 'google_authenticated_div')
+        shinyjs::hide(id = 'google_configured_div')
         shinyjs::show(id = 'google_connect_div')
       })
       observeEvent(input$logout_2, {
         shinyjs::runjs( HTML(allow_nav_jscode, redirect_home) )
-        shinyjs::hide(id = 'google_authenticated_div')
+        shinyjs::hide(id = 'google_configured_div')
         shinyjs::show(id = 'google_connect_div')
       })
       
@@ -162,8 +148,6 @@ bigquery_setup_server <- function(id) {
         if(google_info$is_authorized == 'no') {
           bigrquery::bq_deauth()
           } else { 
-            # shinyjs::hide(id = 'google_connect_div')
-            # shinyjs::show(id = 'google_authenticated_div')
             token <- oauth2.0_token(app = app,
                                     endpoint = api,
                                     credentials = oauth2.0_access_token(api, app, params()$code),
@@ -174,57 +158,65 @@ bigquery_setup_server <- function(id) {
             bigrquery::bq_auth(token = token)
             bigquery_setup$user_info <- gargle::token_userinfo(token = token)
             bigquery_setup$bq_projects <- bigrquery::bq_projects()
-            # browser()
           }
         })
       
-      observeEvent(bigquery_setup$user_info, {
-        req(bigquery_setup$user_info)
-        shinyjs::hide(id = 'google_connect_div')
-        shinyjs::show(id = 'google_authenticated_div')
-      })
-      
-      # output$token_info <- renderPrint(google_info$token) ## Debug
-      
       ## Define the reactive BQ Setup UI ----
-      google_authenticated_ui <- reactive({
-        req(bigquery_setup$user_info)
-        tagList(
-          shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
-                                            subtitle = bigquery_setup$user_info$email,
-                                            src = bigquery_setup$user_info$picture,
-                                            type = 2, 
-                                            color = 'primary',
-                                            collapsible = FALSE,
-                                            HTML(glue::glue('{bigquery_setup$user_info$given_name}, you have successfully authenticated with Google BigQuery. Please select a dataset from from the list of available projects, or sign out and sign in with a different Google Account.<br><br>')),
-                                            br(),
-                                            selectizeInput(inputId = ns('bq_project_id'),
-                                                           label = 'Select from Available Google Projects:',
-                                                           choices = bigquery_setup$bq_projects,
-                                                           options = list(create = FALSE,
-                                                                          placeholder = 'No Available Projects')
-                                                           ),
-                                            selectizeInput(inputId = ns('bq_dataset_id'),
-                                                           label = 'Select from Available BigQuery Datasets:',
-                                                           choices = NULL
-                                                           ),
-                                            shinyjs::hidden(
-                                              div(id = ns('bq_connect_div'),
-                                                actionButton(inputId = ns('bq_connect'),label = 'Connect',icon = icon('cloud'))
-                                                )
-                                              ),
-                                            footer = fluidRow(
-                                              div(actionBttn(inputId = ns('logout'),
-                                                             label = 'Sign Out of Google',
-                                                             style = 'jelly',
-                                                             icon = icon(name = 'sign-out-alt')
-                                                             ),
-                                                  style="float:right"
+      google_connect_ui <- reactive({
+        req(google_info$is_authorized)
+        if(google_info$is_authorized  == 'no') {
+          tagList(
+            shinydashboard::box(title = 'Connect to BigQuery',
+                                width = '100%',
+                                status = 'primary',
+                                solidHeader = F,
+                                HTML('To connect to Google BigQuery, please sign in with your Google Account.<br><br>'),
+                                br(),
+                                actionButton(inputId = ns('login'),
+                                             label = 'Sign In with Google',
+                                             icon = icon(name = 'google')
+                                             )
+                                )
+            )
+          } else { 
+            tagList(
+              shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
+                                                width = 12,
+                                                subtitle = bigquery_setup$user_info$email,
+                                                src = bigquery_setup$user_info$picture,
+                                                type = 2, 
+                                                color = 'primary',
+                                                collapsible = FALSE,
+                                                HTML(glue::glue('{bigquery_setup$user_info$given_name}, you have successfully authenticated with Google BigQuery. Please select a dataset from from the list of available projects, or sign out and sign in with a different Google Account.<br><br>')),
+                                                br(),
+                                                selectizeInput(inputId = ns('bq_project_id'),
+                                                               label = 'Select from Available Google Projects:',
+                                                               choices = bigquery_setup$bq_projects,
+                                                               options = list(create = FALSE,
+                                                                              placeholder = 'No Available Projects')
+                                                               ),
+                                                selectizeInput(inputId = ns('bq_dataset_id'),
+                                                               label = 'Select from Available BigQuery Datasets:',
+                                                               choices = NULL
+                                                               ),
+                                                shinyjs::hidden(
+                                                  div(id = ns('bq_connect_div'),
+                                                      actionButton(inputId = ns('bq_connect'),label = 'Connect',icon = icon('cloud'))
+                                                      )
+                                                  ),
+                                                footer = fluidRow(
+                                                  div(actionBttn(inputId = ns('logout'),
+                                                                 label = 'Sign Out of Google',
+                                                                 style = 'jelly',
+                                                                 icon = icon(name = 'sign-out-alt')
+                                                                 ),
+                                                      style="float:right"
+                                                      )
                                                   )
-                                              )
-                                            )
-          )
-      })
+                                                )
+              ) 
+            }
+        })
       
       ### When the user selects a GCP Project, populate the available dataset selector choices. 
       observeEvent(input$bq_project_id, {
@@ -260,7 +252,7 @@ bigquery_setup_server <- function(id) {
                                                 dataset = bigquery_setup$bq_dataset_id
                                                 )
         bigquery_setup$is_connected <- 'yes'
-        shinyjs::hide('google_authenticated_div')
+        shinyjs::hide('google_connect_div')
         shinyjs::show('google_configured_div')
         })
       
@@ -268,6 +260,7 @@ bigquery_setup_server <- function(id) {
         req(bigquery_setup$is_connected == 'yes')
         tagList(
           shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
+                                            width = 12,
                                             subtitle = bigquery_setup$user_info$email,
                                             src = bigquery_setup$user_info$picture,
                                             type = 2, 
@@ -304,14 +297,12 @@ bigquery_setup_server <- function(id) {
         bigquery_setup$db_con <- NULL
         bigquery_setup$is_connected <- 'no'
         shinyjs::hide('google_configured_div')
-        shinyjs::show('google_authenticated_div')
+        shinyjs::show('google_connect_div')
       })
       
       ## BigQuery Setup Outputs ----
-      output$google_authenticated_ui <- renderUI({ google_authenticated_ui() })
+      output$google_connect_ui <- renderUI({ google_connect_ui() })
       output$google_configured_ui <- renderUI({ google_configured_ui() })
-      outputOptions(output, 'google_authenticated_ui', suspendWhenHidden = F)
-      outputOptions(output, 'google_configured_ui', suspendWhenHidden = F)
       
       # Return Setup Values ----
       return(bigquery_setup)
