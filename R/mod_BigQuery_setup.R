@@ -183,40 +183,43 @@ bigquery_setup_server <- function(id) {
             )
           } else { 
             tagList(
-              shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
-                                                width = 12,
-                                                subtitle = bigquery_setup$user_info$email,
-                                                src = bigquery_setup$user_info$picture,
-                                                type = 2, 
-                                                color = 'primary',
-                                                collapsible = FALSE,
-                                                HTML(glue::glue('{bigquery_setup$user_info$given_name}, you have successfully authenticated with Google BigQuery. Please select a dataset from from the list of available projects, or sign out and sign in with a different Google Account.<br><br>')),
-                                                br(),
-                                                selectizeInput(inputId = ns('bq_project_id'),
-                                                               label = 'Select from Available Google Projects:',
-                                                               choices = bigquery_setup$bq_projects,
-                                                               options = list(create = FALSE,
-                                                                              placeholder = 'No Available Projects')
-                                                               ),
-                                                selectizeInput(inputId = ns('bq_dataset_id'),
-                                                               label = 'Select from Available BigQuery Datasets:',
-                                                               choices = NULL
-                                                               ),
-                                                shinyjs::hidden(
-                                                  div(id = ns('bq_connect_div'),
-                                                      actionButton(inputId = ns('bq_connect'),label = 'Connect',icon = icon('cloud'))
-                                                      )
-                                                  ),
-                                                footer = fluidRow(
-                                                  div(actionBttn(inputId = ns('logout'),
-                                                                 label = 'Sign Out of Google',
-                                                                 style = 'jelly',
-                                                                 icon = icon(name = 'sign-out-alt')
+              div(
+                shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
+                                                  width = 12,
+                                                  subtitle = bigquery_setup$user_info$email,
+                                                  src = bigquery_setup$user_info$picture,
+                                                  type = 2, 
+                                                  color = 'primary',
+                                                  collapsible = FALSE,
+                                                  HTML(glue::glue('{bigquery_setup$user_info$given_name}, you have successfully authenticated with Google BigQuery. Please select a dataset from from the list of available projects, or sign out and sign in with a different Google Account.<br><br>')),
+                                                  br(),
+                                                  selectizeInput(inputId = ns('bq_project_id'),
+                                                                 label = 'Select from Available Google Projects:',
+                                                                 choices = bigquery_setup$bq_projects,
+                                                                 options = list(create = FALSE,
+                                                                                placeholder = 'No Available Projects')
                                                                  ),
-                                                      style="float:right;margin-right:20px"
-                                                      )
-                                                  )
-                                                )
+                                                  selectizeInput(inputId = ns('bq_dataset_id'),
+                                                                 label = 'Select from Available BigQuery Datasets:',
+                                                                 choices = NULL
+                                                                 ),
+                                                  shinyjs::hidden(
+                                                    div(id = ns('bq_connect_div'),
+                                                        actionButton(inputId = ns('bq_connect'),label = 'Connect',icon = icon('cloud'))
+                                                        )
+                                                    ),
+                                                  footer = fluidRow(
+                                                    div(actionBttn(inputId = ns('logout'),
+                                                                   label = 'Sign Out of Google',
+                                                                   style = 'jelly',
+                                                                   icon = icon(name = 'sign-out-alt')
+                                                                   ),
+                                                        style="float:right;margin-right:20px"
+                                                        )
+                                                    )
+                                                  ), 
+                style = 'margin-left:-15px;margin-right:-15px'
+                )
               ) 
             }
         })
