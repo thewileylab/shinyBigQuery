@@ -15,7 +15,7 @@ bigquery_setup_ui <- function(id) {
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
-    uiOutput(ns('token_info')),
+    # uiOutput(ns('token_info')), ## Debug
     div(id = ns('google_connect_div'),
       shinydashboard::box(title = 'Connect to BigQuery',
                           width = '100%',
@@ -183,7 +183,9 @@ bigquery_setup_server <- function(id) {
         shinyjs::hide(id = 'google_connect_div')
         shinyjs::show(id = 'google_authenticated_div')
       })
-      output$token_info <- renderPrint(google_info$token)
+      
+      # output$token_info <- renderPrint(google_info$token) ## Debug
+      
       ## Define the reactive BQ Setup UI ----
       google_authenticated_ui <- reactive({
         req(bigquery_setup$user_info)
@@ -308,6 +310,8 @@ bigquery_setup_server <- function(id) {
       ## BigQuery Setup Outputs ----
       output$google_authenticated_ui <- renderUI({ google_authenticated_ui() })
       output$google_configured_ui <- renderUI({ google_configured_ui() })
+      outputOptions(output, 'google_authenticated_ui', suspendWhenHidden = F)
+      outputOptions(output, 'google_configured_ui', suspendWhenHidden = F)
       
       # Return Setup Values ----
       return(bigquery_setup)
