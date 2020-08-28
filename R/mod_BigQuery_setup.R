@@ -213,7 +213,7 @@ bigquery_setup_server <- function(id) {
                                                                  style = 'jelly',
                                                                  icon = icon(name = 'sign-out-alt')
                                                                  ),
-                                                      style="float:right"
+                                                      style="float:right;margin-right:20px"
                                                       )
                                                   )
                                                 )
@@ -287,7 +287,7 @@ bigquery_setup_server <- function(id) {
                                                              style = 'jelly',
                                                              icon = icon(name = 'sign-out-alt')
                                                              ),
-                                                  style="float:right"
+                                                  style="float:right;margin-right:20px"
                                                   )
                                               )
                                             )
