@@ -17,7 +17,8 @@ bigquery_setup_ui <- function(id) {
     golem_add_external_resources(),
     fluidRow(
       div(id = ns('google_connect_div'),
-          uiOutput(ns('google_connect_ui')) %>% shinycssloaders::withSpinner()
+          uiOutput(ns('google_connect_ui')) %>% shinycssloaders::withSpinner(),
+          style = 'margin-left:15px;margin-right:15px'
           ),
     shinyjs::hidden(
       div(id = ns('google_configured_div'),
