@@ -15,14 +15,16 @@ bigquery_setup_ui <- function(id) {
   ns <- NS(id)
   tagList(
     golem_add_external_resources(),
-    div(id = ns('google_connect_div'),
-        uiOutput(ns('google_connect_ui')) %>% shinycssloaders::withSpinner()
-    ),
+    fluidRow(
+      div(id = ns('google_connect_div'),
+          uiOutput(ns('google_connect_ui')) %>% shinycssloaders::withSpinner()
+          ),
     shinyjs::hidden(
       div(id = ns('google_configured_div'),
           uiOutput(ns('google_configured_ui')) %>% shinycssloaders::withSpinner()
           )
       )
+    )
     )
   }
 
