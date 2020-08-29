@@ -95,12 +95,9 @@ bigquery_setup_server <- function(id) {
       ### Extract any parameters from the URL (anything that isn't one of the things above)
       params <- reactive({ parseQueryString(isolate(session$clientData$url_search)) })
       observeEvent(params(), {
-        if(is.null(params()$code)) {
-          google_info$is_authorized <- 'no' 
-        } else {
-            google_info$is_authorized <- 'yes'
-          }
-      })
+        req(params()$code) 
+        google_info$is_authorized <- 'yes'
+        })
       
       ## OAuth Dance ----
       #### We can dance if we want to
@@ -151,15 +148,14 @@ bigquery_setup_server <- function(id) {
         if(google_info$is_authorized == 'no') {
           bigrquery::bq_deauth()
           } else { 
-            token <- oauth2.0_token(app = app,
-                                    endpoint = api,
-                                    credentials = oauth2.0_access_token(api, app, params()$code),
-                                    cache = FALSE
-                                    )
-            google_info$token <- token
+            google_info$token <- oauth2.0_token(app = app,
+                                                endpoint = api,
+                                                credentials = oauth2.0_access_token(api, app, params()$code),
+                                                cache = FALSE
+                                                )
             #### And authenticate the UI
-            bigrquery::bq_auth(token = token)
-            bigquery_setup$user_info <- gargle::token_userinfo(token = token)
+            bigrquery::bq_auth(token = google_info$token)
+            bigquery_setup$user_info <- gargle::token_userinfo(token = google_info$token)
             bigquery_setup$bq_projects <- bigrquery::bq_projects()
           }
         })
