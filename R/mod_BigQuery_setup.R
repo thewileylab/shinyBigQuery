@@ -66,7 +66,7 @@ bigquery_setup_server <- function(id) {
         ### Module Info
         moduleName = 'BigQuery',
         moduleType = 'database',
-        ui = shinyBigQuery::bigquery_setup_ui(id),
+        ui = shinyBigQuery::bigquery_setup_ui,
         ### Connection Variables
         user_info = NULL,
         bq_projects = NULL,
@@ -160,9 +160,10 @@ bigquery_setup_server <- function(id) {
           }
         })
       
-      ## Define the reactive BQ Setup UI ----
+      ## BQ Setup UI ----
       google_connect_ui <- reactive({
-        req(google_info$is_authorized)
+        # browser()
+        # req(google_info$is_authorized)
         if(google_info$is_authorized  == 'no') {
           tagList(
             shinydashboard::box(title = 'Connect to BigQuery',
