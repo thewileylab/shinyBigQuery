@@ -63,21 +63,28 @@ bigquery_setup_server <- function(id) {
       
       ## BigQuery Setup Values ----
       bigquery_setup <- reactiveValues(
+        ### Connection Variables
+        bq_projects = NULL,
+        bq_project_id = NULL,
+        bq_dataset_id = NULL
+        # is_connected = 'no'
+        )
+      
+      ## Google Values ----
+      google_info <- reactiveValues(
+        is_authorized = 'no'
+        )
+      
+      ## BigQuery Export Values ----
+      bigquery_export <- reactiveValues(
         ### Module Info
         moduleName = 'BigQuery',
         moduleType = 'database',
-        ui = shinyBigQuery::bigquery_setup_ui,
-        ### Connection Variables
-        user_info = NULL,
-        bq_projects = NULL,
-        bq_project_id = NULL,
-        bq_dataset_id = NULL,
+        setup_ui = shinyBigQuery::bigquery_setup_ui,
+        is_connected = 'no',       
         db_con = NULL,
-        is_connected = 'no'
+        user_info = NULL
         )
-      google_info <- reactiveValues(
-        is_authorized = 'no'
-      )
       
       ## Client URL Information ----
       protocol <- isolate(session$clientData$url_protocol)
@@ -155,7 +162,7 @@ bigquery_setup_server <- function(id) {
                                                 )
             #### And authenticate the UI
             bigrquery::bq_auth(token = google_info$token)
-            bigquery_setup$user_info <- gargle::token_userinfo(token = google_info$token)
+            bigquery_export$user_info <- gargle::token_userinfo(token = google_info$token)
             bigquery_setup$bq_projects <- bigrquery::bq_projects()
           }
         })
@@ -181,14 +188,14 @@ bigquery_setup_server <- function(id) {
           } else { 
             tagList(
               div(
-                shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
+                shinydashboardPlus::widgetUserBox(title = bigquery_export$user_info$name,
                                                   width = 12,
-                                                  subtitle = bigquery_setup$user_info$email,
-                                                  src = bigquery_setup$user_info$picture,
+                                                  subtitle = bigquery_export$user_info$email,
+                                                  src = bigquery_export$user_info$picture,
                                                   type = 2, 
                                                   color = 'primary',
                                                   collapsible = FALSE,
-                                                  HTML(glue::glue('{bigquery_setup$user_info$given_name}, you have successfully authenticated with Google BigQuery. Please select a dataset from from the list of available projects, or sign out and sign in with a different Google Account.<br><br>')),
+                                                  HTML(glue::glue('{bigquery_export$user_info$given_name}, you have successfully authenticated with Google BigQuery. Please select a dataset from from the list of available projects, or sign out and sign in with a different Google Account.<br><br>')),
                                                   br(),
                                                   selectizeInput(inputId = ns('bq_project_id'),
                                                                  label = 'Select from Available Google Projects:',
@@ -250,22 +257,22 @@ bigquery_setup_server <- function(id) {
       observeEvent(input$bq_connect, {
         bigquery_setup$bq_project_id <- input$bq_project_id
         bigquery_setup$bq_dataset_id <- input$bq_dataset_id
-        bigquery_setup$db_con <- DBI::dbConnect(drv = bigquery(),
+        bigquery_export$db_con <- DBI::dbConnect(drv = bigquery(),
                                                 project = bigquery_setup$bq_project_id,
                                                 dataset = bigquery_setup$bq_dataset_id
                                                 )
-        bigquery_setup$is_connected <- 'yes'
+        bigquery_export$is_connected <- 'yes'
         shinyjs::hide('google_connect_div')
         shinyjs::show('google_configured_div')
         })
       
       google_configured_ui <- reactive({
-        req(bigquery_setup$is_connected == 'yes')
+        req(bigquery_export$is_connected == 'yes')
         tagList(
-          shinydashboardPlus::widgetUserBox(title = bigquery_setup$user_info$name,
+          shinydashboardPlus::widgetUserBox(title = bigquery_export$user_info$name,
                                             width = 12,
-                                            subtitle = bigquery_setup$user_info$email,
-                                            src = bigquery_setup$user_info$picture,
+                                            subtitle = bigquery_export$user_info$email,
+                                            src = bigquery_export$user_info$picture,
                                             type = 2, 
                                             color = 'primary',
                                             collapsible = FALSE,
@@ -297,8 +304,8 @@ bigquery_setup_server <- function(id) {
       observeEvent(input$disconnect, {
         bigquery_setup$bq_project_id <- NULL
         bigquery_setup$bq_dataset_id <- NULL
-        bigquery_setup$db_con <- NULL
-        bigquery_setup$is_connected <- 'no'
+        bigquery_export$db_con <- NULL
+        bigquery_export$is_connected <- 'no'
         shinyjs::hide('google_configured_div')
         shinyjs::show('google_connect_div')
       })
@@ -308,7 +315,7 @@ bigquery_setup_server <- function(id) {
       output$google_configured_ui <- renderUI({ google_configured_ui() })
       
       # Return Setup Values ----
-      return(bigquery_setup)
+      return(bigquery_export)
       }
     )
   }
