@@ -33,6 +33,7 @@ bigquery_setup_ui <- function(id) {
 #' BigQuery Setup Server
 #'
 #' @param id The Module namespace
+#' @param secrets_json Location of Google secrets json
 #'
 #' @return BigQuery connection variables and user information
 #' @export
@@ -53,7 +54,7 @@ bigquery_setup_ui <- function(id) {
 #' @importFrom tibble tibble enframe
 #' @importFrom tidyr unnest
 #' 
-bigquery_setup_server <- function(id) {
+bigquery_setup_server <- function(id, secrets_json = '~/.shinyBigQuery/client_secret/client_secret.json') {
   moduleServer(
     id,
     function(input, output, session) {
@@ -109,7 +110,11 @@ bigquery_setup_server <- function(id) {
       ## OAuth Dance ----
       #### We can dance if we want to
       ### OAuth 2.0 Client ID
-      secrets <- jsonlite::fromJSON(txt = system.file('extdata/OAuth_ClientID/client_secret.json', package = 'shinyBigQuery'))
+      secrets <- if(file.exists(secrets_json)) { 
+        jsonlite::fromJSON(txt = file(secrets_json))
+        } else {
+          NULL
+          }
       app <- oauth_app(appname = "shinyBigQuery",
                        key = secrets$web$client_id,
                        secret = secrets$web$client_secret,
@@ -171,7 +176,22 @@ bigquery_setup_server <- function(id) {
       google_connect_ui <- reactive({
         # browser()
         # req(google_info$is_authorized)
-        if(google_info$is_authorized  == 'no') {
+        if(is.null(secrets)) {
+          tagList(
+            shinydashboard::box(title = 'Warning: Application Client Secret Not Found',
+                                width = '100%',
+                                status = 'primary',
+                                solidHeader = F,
+                                HTML('To connect to a Google BigQuery database, please generate a Google OAuth2.0 client secret JSON and enable the BigQuery API:<br><br>
+                                        <ul>
+                                             <li> <a href="https://cloud.google.com/docs/authentication/end-user">https://cloud.google.com/docs/authentication/end-user </a></li>
+                                        </ul>
+                                     Download the JSON, rename it to "client_secret.json" and copy it to "~/.shinyBigQuery/client_secret"'
+                                     ),
+                                br()
+                                ) 
+            )
+        } else if(google_info$is_authorized  == 'no') {
           tagList(
             shinydashboard::box(title = 'Connect to BigQuery',
                                 width = '100%',

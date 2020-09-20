@@ -4,10 +4,15 @@
 \alias{bigquery_setup_server}
 \title{BigQuery Setup Server}
 \usage{
-bigquery_setup_server(id)
+bigquery_setup_server(
+  id,
+  secrets_json = "~/.shinyBigQuery/client_secret/client_secret.json"
+)
 }
 \arguments{
 \item{id}{The Module namespace}
+
+\item{secrets_json}{Location of Google secrets json}
 }
 \value{
 BigQuery connection variables and user information
