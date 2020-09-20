@@ -178,15 +178,15 @@ bigquery_setup_server <- function(id, secrets_json = '~/.shinyBigQuery/client_se
         # req(google_info$is_authorized)
         if(is.null(secrets)) {
           tagList(
-            shinydashboard::box(title = 'Warning: Application Client Secret Not Found',
+            shinydashboard::box(title = 'Warning: Application Client Credentials Not Found',
                                 width = '100%',
                                 status = 'primary',
                                 solidHeader = F,
-                                HTML('To connect to a Google BigQuery database, please generate a Google OAuth2.0 client secret JSON and enable the BigQuery API:<br><br>
+                                HTML('To connect to a Google BigQuery database, please generate a Google OAuth2.0 Client ID and enable access the BigQuery API within your project:<br><br>
                                         <ul>
                                              <li> <a href="https://cloud.google.com/docs/authentication/end-user">https://cloud.google.com/docs/authentication/end-user </a></li>
                                         </ul>
-                                     Download the JSON, rename it to "client_secret.json" and copy it to "~/.shinyBigQuery/client_secret"'
+                                     Download the client ID JSON as "client_secret.json" and copy it to "~/.shinyBigQuery/client_secret". Then reload the application.'
                                      ),
                                 br()
                                 ) 
