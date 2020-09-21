@@ -6,7 +6,7 @@
 \usage{
 bigquery_setup_server(
   id,
-  secrets_json = "~/.shinyBigQuery/client_secret/client_secret.json"
+  secrets_json = "/srv/shiny-server/.shinyBigQuery/client_secret.json"
 )
 }
 \arguments{

@@ -54,7 +54,7 @@ bigquery_setup_ui <- function(id) {
 #' @importFrom tibble tibble enframe
 #' @importFrom tidyr unnest
 #' 
-bigquery_setup_server <- function(id, secrets_json = '~/.shinyBigQuery/client_secret/client_secret.json') {
+bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBigQuery/client_secret.json') {
   moduleServer(
     id,
     function(input, output, session) {
@@ -193,7 +193,7 @@ bigquery_setup_server <- function(id, secrets_json = '~/.shinyBigQuery/client_se
                                         <ul>
                                              <li> <a href="https://cloud.google.com/docs/authentication/end-user">https://cloud.google.com/docs/authentication/end-user </a></li>
                                         </ul>
-                                     Download the client ID JSON as "client_secret.json" and copy it to "~/.shinyBigQuery/client_secret". Then reload the application.'
+                                     Download the client ID JSON as "client_secret.json" and copy it to "/srv/shiny_server/.shinyBigQuery". Then reload the application.'
                                      ),
                                 br()
                                 ) 
