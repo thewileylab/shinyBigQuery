@@ -109,17 +109,24 @@ bigquery_setup_server <- function(id, secrets_json = '~/.shinyBigQuery/client_se
       
       ## OAuth Dance ----
       #### We can dance if we want to
-      ### OAuth 2.0 Client ID
-      secrets <- if(file.exists(secrets_json)) { 
-        jsonlite::fromJSON(txt = file(secrets_json))
+      ### OAuth 2.0 Client ID using user supplied client_secrets.json
+      if(file.exists(secrets_json) & hostname != 'localhost') { 
+        ### Web Authorization
+        secrets <- jsonlite::fromJSON(txt = file(secrets_json))
+        app <- oauth_app(appname = "shinyBigQuery",
+                         key = secrets$web$client_id,
+                         secret = secrets$web$client_secret,
+                         redirect_uri = client_url
+                         )
         } else {
-          NULL
+          ### Installed Authorization using package client_secrets.json
+          secrets <- jsonlite::fromJSON(txt = system.file('extdata/OAuth_ClientID/client_secret.json', package = 'shinyBigQuery'))
+          app <- oauth_app(appname = "shinyBigQuery",
+                           key = secrets$installed$client_id,
+                           secret = secrets$installed$client_secret,
+                           redirect_uri = client_url
+                           )
           }
-      app <- oauth_app(appname = "shinyBigQuery",
-                       key = secrets$web$client_id,
-                       secret = secrets$web$client_secret,
-                       redirect_uri = client_url
-                       )
       
       ### Define Google as the endpoint (this one is canned)
       api <- oauth_endpoints("google")
@@ -174,9 +181,9 @@ bigquery_setup_server <- function(id, secrets_json = '~/.shinyBigQuery/client_se
       
       ## BQ Setup UI ----
       google_connect_ui <- reactive({
-        # browser()
+        browser()
         # req(google_info$is_authorized)
-        if(is.null(secrets)) {
+        if(!file.exists(secrets_json) & hostname != 'localhost') {
           tagList(
             shinydashboard::box(title = 'Warning: Application Client Credentials Not Found',
                                 width = '100%',
