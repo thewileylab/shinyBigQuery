@@ -181,7 +181,7 @@ bigquery_setup_server <- function(id, secrets_json = '~/.shinyBigQuery/client_se
       
       ## BQ Setup UI ----
       google_connect_ui <- reactive({
-        browser()
+        # browser()
         # req(google_info$is_authorized)
         if(!file.exists(secrets_json) & hostname != 'localhost') {
           tagList(
