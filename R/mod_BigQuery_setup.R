@@ -1,8 +1,13 @@
 # Helpers ----
+#' Installed App
+#' 
+#' Invisibly returns an OAuth app 
+#'
+#' @return An Invisible OAuth consumer application, produced by [httr::oauth_app()]
+#'
 #' @export
 #' @keywords internal
 #' @rdname internal-assets
-#' @noRd
 installed_app <- function() {
   sbqoa()
 }
@@ -10,8 +15,9 @@ installed_app <- function() {
 #' @keywords internal
 #' @rdname internal-assets
 #' @noRd
-print.hidden_fn <- function(obj) {
-  cat('Nope')
+print.hidden_fn <- function(x, ...) {
+  x <- 'Nope'
+  NextMethod('print')
 }
 
 # UI ----
