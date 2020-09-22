@@ -36,7 +36,7 @@ To integrate shinyBigQuery with your Shiny application place
 `bigquery_setup_ui()` and `bigquery_setup_server()` functions into your
 applications ui and server functions respectively. Note, as Google
 relies on OAuth 2.0 authentication, this application must run on port
-8100 in a browser. An example is given below:
+1410 in a browser. An example is given below:
 
 ``` r
 library(shiny)
