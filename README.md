@@ -51,7 +51,7 @@ server <- function(input, output, session) {
 }
 
 if (interactive())
-  shinyApp(ui = ui, server = server, options = list(port = 8100, launch.browser = T))
+  shinyApp(ui = ui, server = server, options = list(port = 1410, launch.browser = T))
 ```
 
 ## Code of Conduct
