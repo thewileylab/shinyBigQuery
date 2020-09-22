@@ -35,5 +35,6 @@ Suggests:
     htmltools,
     processx,
     spelling,
+    sodium,
     testthat
 Language: en-US

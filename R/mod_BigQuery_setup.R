@@ -1,3 +1,19 @@
+# Helpers ----
+#' @export
+#' @keywords internal
+#' @rdname internal-assets
+#' @noRd
+installed_app <- function() {
+  sbqoa()
+}
+#' @export
+#' @keywords internal
+#' @rdname internal-assets
+#' @noRd
+print.hidden_fn <- function(obj) {
+  cat('Nope')
+}
+
 # UI ----
 #' BigQuery Setup UI
 #'
@@ -111,7 +127,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
       #### We can dance if we want to
       ### OAuth 2.0 Client ID using user supplied client_secrets.json
       if(file.exists(secrets_json) & hostname != 'localhost') { 
-        ### Web Authorization
+        ### Web Authorization using user supplied client_secrets.json
         secrets <- jsonlite::fromJSON(txt = file(secrets_json))
         app <- oauth_app(appname = "shinyBigQuery",
                          key = secrets$web$client_id,
@@ -120,12 +136,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
                          )
         } else {
           ### Installed Authorization using package client_secrets.json
-          secrets <- jsonlite::fromJSON(txt = system.file('extdata/OAuth_ClientID/client_secret.json', package = 'shinyBigQuery'))
-          app <- oauth_app(appname = "shinyBigQuery",
-                           key = secrets$installed$client_id,
-                           secret = secrets$installed$client_secret,
-                           redirect_uri = client_url
-                           )
+          app <- installed_app()
           }
       
       ### Define Google as the endpoint (this one is canned)
