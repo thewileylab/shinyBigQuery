@@ -153,7 +153,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
       ### - read only access to storage api (required to run queries)
       ### - view your email address
       ### - See your personal info, including any personal info you've made publicly available
-      scopes <- "https://www.googleapis.com/auth/bigquery.readonly https://www.googleapis.com/auth/devstorage.read_only https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+      scopes <- "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/bigquery https://www.googleapis.com/auth/cloud-platform"
       
       ## Google Endpoint
       google_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes)

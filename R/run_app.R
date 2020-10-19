@@ -14,3 +14,12 @@ run_app <- function(...) {
     golem_opts = list(...)
   )
 }
+#' shinyBigQuery: Access Google BigQuery through R Shiny
+#' 
+#' A shiny module to authenticate your R Shiny Application with Google BigQuery.
+#' 
+#' 
+#' @docType package
+#' @name shinyBigQuery
+NULL
+#> NULL

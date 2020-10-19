@@ -22,7 +22,7 @@ The goal of shinyBigQuery is to allow a Shiny application to perform interactive
 
 ## Installation
 
-You can install the released version of shinyBigQuery from [GitHub](https://github.com/) with:
+You can install the released version of shinyBigQuery from [GitHub](https://github.com/thewileylab/shinyBigQuery) with:
 
 ``` r
 # install.packages("devtools")

@@ -1,0 +1,18 @@
+destination: docs
+reference:
+  - title: "Package Information"
+    contents:
+      - shinyBigQuery
+  - title: "Start Using shinyBigQuery"
+    desc: >
+      Execute this function to launch shinyBigQuery.
+    contents: 
+      - run_app
+  - title: "Module UI Functions"
+    desc: "Add these functions to the UI portion of your Shiny Application with the appropriate namespace."
+    contents: 
+      - bigquery_setup_ui
+  - title: "Module Server Function"
+    desc: "Add the server function to the server portion of your Shiny Application with the appropriate namespace."
+    contents:
+      - bigquery_setup_server

@@ -15,7 +15,7 @@ stored in their Google Cloud projects.
 ## Installation
 
 You can install the released version of shinyBigQuery from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/thewileylab/shinyBigQuery) with:
 
 ``` r
 # install.packages("devtools")
