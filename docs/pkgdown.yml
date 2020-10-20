@@ -2,8 +2,8 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2020-10-20T21:22Z
+last_built: 2020-10-20T21:26Z
 urls:
-  reference: https://shinybigquery.thewileylab.org/reference
-  article: https://shinybigquery.thewileylab.org/articles
+  reference: shinybigquery.thewileylab.org//reference
+  article: shinybigquery.thewileylab.org//articles
 

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://shinybigquery.thewileylab.org/index.html</loc>
+    <loc>shinybigquery.thewileylab.org//index.html</loc>
   </url>
   <url>
-    <loc>https://shinybigquery.thewileylab.org/reference/bigquery_setup_server.html</loc>
+    <loc>shinybigquery.thewileylab.org//reference/bigquery_setup_server.html</loc>
   </url>
   <url>
-    <loc>https://shinybigquery.thewileylab.org/reference/bigquery_setup_ui.html</loc>
+    <loc>shinybigquery.thewileylab.org//reference/bigquery_setup_ui.html</loc>
   </url>
   <url>
-    <loc>https://shinybigquery.thewileylab.org/reference/internal-assets.html</loc>
+    <loc>shinybigquery.thewileylab.org//reference/internal-assets.html</loc>
   </url>
   <url>
-    <loc>https://shinybigquery.thewileylab.org/reference/run_app.html</loc>
+    <loc>shinybigquery.thewileylab.org//reference/run_app.html</loc>
   </url>
   <url>
-    <loc>https://shinybigquery.thewileylab.org/reference/shinyBigQuery.html</loc>
+    <loc>shinybigquery.thewileylab.org//reference/shinyBigQuery.html</loc>
   </url>
 </urlset>
