@@ -7,6 +7,8 @@
 
 <!-- badges: end -->
 
+## Overview
+
 The goal of shinyBigQuery is to allow a Shiny application to perform
 interactive authentication with Google BigQuery and assist with creating
 a DBI connection object. This allows users to access BigQuery datasets

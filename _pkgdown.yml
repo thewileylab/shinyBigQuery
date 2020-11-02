@@ -1,4 +1,19 @@
 url: shinybigquery.thewileylab.org
+template:
+  params:
+    bootswatch: flatly
+navbar:
+  structure:
+    right: [reference, github]
+home:
+  strip_header: true
+  links:
+  - text: Additional WileyLab tools
+    href: https://www.thewileylab.org/software
+authors:
+  The Wiley Lab:
+    href: https://www.thewileylab.org/
+    html: <img src="https://raw.githubusercontent.com/thewileylab/shinyBigQuery/main/man/figures/WileyLab.svg" height="24" />
 reference:
   - title: "Package Information"
     contents:
