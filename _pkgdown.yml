@@ -13,7 +13,7 @@ home:
 authors:
   The Wiley Lab:
     href: https://www.thewileylab.org/
-    html: <img src="https://raw.githubusercontent.com/thewileylab/shinyBigQuery/main/man/figures/WileyLab.svg" height="24" />
+    html: <img src="https://raw.githubusercontent.com/thewileylab/shinyBigQuery/master/man/figures/WileyLab.svg" height="24" />
 reference:
   - title: "Package Information"
     contents:
