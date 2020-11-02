@@ -90,7 +90,6 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
         bq_projects = NULL,
         bq_project_id = NULL,
         bq_dataset_id = NULL
-        # is_connected = 'no'
         )
       
       ## Google Values ----
@@ -113,7 +112,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
       protocol <- isolate(session$clientData$url_protocol)
       hostname <- if (isolate(session$clientData$url_hostname) == '127.0.0.1') {
         'localhost'
-      } else { isolate(session$clientData$url_hostname)
+        } else { isolate(session$clientData$url_hostname)
           }
       port <- isolate(session$clientData$url_port)
       pathname <- isolate(session$clientData$url_pathname)
@@ -149,9 +148,9 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
       api <- oauth_endpoints("google")
       
       ### Always request the minimal scope needed. Here, we are requesting:
-      ### - read only access to BigQuery
-      ### - read only access to storage api (required to run queries)
-      ### - view your email address
+      ### - Read/Write access to BigQuery
+      ### - Read/Write access Google Cloud Platform (required to download query results/utilize Google Cloud Storage)
+      ### - View your email address
       ### - See your personal info, including any personal info you've made publicly available
       scopes <- "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/bigquery https://www.googleapis.com/auth/cloud-platform"
       
@@ -198,8 +197,6 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
       
       ## BQ Setup UI ----
       google_connect_ui <- reactive({
-        # browser()
-        # req(google_info$is_authorized)
         if(!file.exists(secrets_json) & hostname != 'localhost') {
           tagList(
             shinydashboard::box(title = 'Warning: Application Client Credentials Not Found',
@@ -281,7 +278,6 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
           dplyr::filter(.data$name == 'dataset') %>%
           tidyr::unnest(.data$value) %>%
           dplyr::pull(.data$value)
-        # browser()
         updateSelectizeInput(session = session,
                              inputId = 'bq_dataset_id',
                              choices = dataset_choices,
