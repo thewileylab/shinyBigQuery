@@ -1,6 +1,6 @@
 Package: shinyBigQuery
 Title: shinyBigQuery: Access Google BigQuery through R Shiny
-Version: 0.0.2.9001
+Version: 0.0.2.9002
 Authors@R: c(
             person('David', 'Mayer', email = 'david.mayer@cuanschutz.edu', role = c('cre', 'aut')),
             person(given = "The Wiley Lab", role = c("cph", "fnd"))

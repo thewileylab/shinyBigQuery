@@ -148,11 +148,11 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
       api <- oauth_endpoints("google")
       
       ### Always request the minimal scope needed. Here, we are requesting:
-      ### - Read/Write access to BigQuery
-      ### - Read/Write access Google Cloud Platform (required to download query results/utilize Google Cloud Storage)
+      ### - Read access to BigQuery
+      ### - Read access dev_storage (required to download collect results)
       ### - View your email address
       ### - See your personal info, including any personal info you've made publicly available
-      scopes <- "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/bigquery https://www.googleapis.com/auth/cloud-platform"
+      scopes <- "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/bigquery.readonly https://www.googleapis.com/auth/devstorage.read_only"
       
       ## Google Endpoint
       google_auth_url <- oauth2.0_authorize_url(api, app, scope = scopes)
