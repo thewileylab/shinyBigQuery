@@ -160,7 +160,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
       redirect_home <- sprintf("window.location.replace(\"%s\");", client_url)
       
       ### When the login button is pressed, redirect to Google for authentication
-      observeEvent(input$login, ignoreInit = T, {
+      observeEvent(input$sbq_login, ignoreInit = T, {
         #### We can leave this app behind
         shinyjs::runjs( HTML(allow_nav_jscode, redirect) )
         })
@@ -220,7 +220,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
                                 solidHeader = F,
                                 HTML('To connect to Google BigQuery, please sign in with your Google Account.<br><br>'),
                                 br(),
-                                actionButton(inputId = ns('login'),
+                                actionButton(inputId = ns('sbq_login'),
                                              label = 'Sign In with Google',
                                              icon = icon(name = 'google')
                                              )
@@ -327,7 +327,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
                                                        '<br>'
                                                        )
                                                  ),
-                                            actionButton(inputId = ns('disconnect'),label = 'Disconnect'),
+                                            actionButton(inputId = ns('sbq_disconnect'), label = 'Disconnect'),
                                             footer = fluidRow(
                                               div(actionBttn(inputId = ns('logout_2'),
                                                              label = 'Sign Out of Google',
@@ -341,7 +341,8 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
           )
         })
       
-      observeEvent(input$disconnect, {
+      observeEvent(input$sbq_disconnect, {
+        req(class(bigquery_export$db_con)[[1]] == 'BigQueryConnection')
         bigquery_setup$bq_project_id <- NULL
         bigquery_setup$bq_dataset_id <- NULL
         bigquery_export$db_con <- NULL
