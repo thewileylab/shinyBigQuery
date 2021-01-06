@@ -38,17 +38,12 @@ sbq_add_external_resources <- function(){
   )
   
   tags$head(
-    favicon(),
-    bundle_resources(
-      path = app_sys('app/www'),
-      app_title = 'shinyBigQuery'
-    ),
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
     shinyjs::useShinyjs(),
     shinyWidgets::useShinydashboard(),
     shinyWidgets::useShinydashboardPlus()
-  )
+    )
 }
 
 # UI ----
@@ -197,10 +192,10 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.bq_clie
             ### Installed Package Authorization using client_secrets.json in prescribed default location.
             secrets <- jsonlite::fromJSON(txt = file(secrets_json_default))
             app <- oauth_app(appname = "shinyBigQuery",
-                       key = secrets$installed$client_id,
-                       secret = secrets$installed$client_secret,
-                       redirect_uri = client_url
-                       )
+                             key = secrets$installed$client_id,
+                             secret = secrets$installed$client_secret,
+                             redirect_uri = client_url
+                             )
             } else {
               ### Installed Package Authorization using package client_secrets.json
               ### After exhausting all other options, use the credentials installed by the package.
