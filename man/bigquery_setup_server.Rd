@@ -6,13 +6,13 @@
 \usage{
 bigquery_setup_server(
   id,
-  secrets_json = "/srv/shiny-server/.shinyBigQuery/client_secret.json"
+  secrets_json = "/srv/shiny-server/.bq_client_id/client_secret.json"
 )
 }
 \arguments{
 \item{id}{The Module namespace}
 
-\item{secrets_json}{Location of Google secrets json}
+\item{secrets_json}{Location of Google secrets json. Defaults to '/srv/shiny-server/.bq_client_id/client_secret.json' for Shiny Server installations.}
 }
 \value{
 BigQuery connection variables and user information
