@@ -240,9 +240,9 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.bq_clie
                                 solidHeader = F,
                                 HTML('To connect to a Google BigQuery database, please generate a Google OAuth2.0 Client ID and enable access the BigQuery API within your project:<br><br>
                                         <ul>
-                                             <li> <a href="https://cloud.google.com/docs/authentication/end-user">https://cloud.google.com/docs/authentication/end-user </a></li>
+                                             <li> <a href="https://developers.google.com/identity/protocols/oauth2/web-server" target="_blank" rel="noopener noreferrer">https://developers.google.com/identity/protocols/oauth2/web-server </a></li>
                                         </ul>
-                                     Download the client ID JSON as "client_secret.json" and copy it to "/srv/shiny_server/.shinyBigQuery". Then reload the application.'
+                                     Download the client ID JSON as "client_secret.json" and copy it to "/srv/shiny_server/.bq_client_id". Then reload the application.'
                                      ),
                                 br()
                                 ) 
