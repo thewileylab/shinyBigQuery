@@ -1,3 +1,4 @@
+# shinyBigQuery: https://github.com/thewileylab/shinyBigQuery/
 # Helpers ----
 #' Installed App
 #' 
@@ -20,6 +21,36 @@ print.hidden_fn <- function(x, ...) {
   NextMethod('print')
 }
 
+#' Add external Resources to the Application
+#' 
+#' This function is internally used to add external 
+#' resources inside the Shiny application. 
+#' 
+#' @import shiny
+#' @importFrom golem add_resource_path activate_js favicon bundle_resources
+#' @importFrom shinyjs useShinyjs
+#' @importFrom shinyWidgets useShinydashboard useShinydashboardPlus
+#' @noRd
+sbq_add_external_resources <- function(){
+  
+  add_resource_path(
+    'www', app_sys('app/www')
+  )
+  
+  tags$head(
+    favicon(),
+    bundle_resources(
+      path = app_sys('app/www'),
+      app_title = 'shinyBigQuery'
+    ),
+    # Add here other external resources
+    # for example, you can add shinyalert::useShinyalert() 
+    shinyjs::useShinyjs(),
+    shinyWidgets::useShinydashboard(),
+    shinyWidgets::useShinydashboardPlus()
+  )
+}
+
 # UI ----
 #' BigQuery Setup UI
 #'
@@ -36,7 +67,7 @@ print.hidden_fn <- function(x, ...) {
 bigquery_setup_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    golem_add_external_resources(),
+    sbq_add_external_resources(),
     fluidRow(
       div(id = ns('google_connect_div'),
           uiOutput(ns('google_connect_ui')) %>% shinycssloaders::withSpinner(),
@@ -73,7 +104,7 @@ bigquery_setup_ui <- function(id) {
 #' @importFrom shinyjs runjs show hide
 #' @importFrom shinydashboardPlus widgetUserBox
 #' @importFrom shinyWidgets actionBttn
-#' @importFrom tibble tibble enframe
+#' @importFrom tibble enframe
 #' @importFrom tidyr unnest
 #' 
 bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.bq_client_id/client_secret.json') {
@@ -102,7 +133,7 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.bq_clie
         ### Module Info
         moduleName = 'BigQuery',
         moduleType = 'database',
-        setup_ui = shinyBigQuery::bigquery_setup_ui,
+        setup_ui = bigquery_setup_ui,
         is_connected = 'no',       
         db_con = NULL,
         user_info = NULL
