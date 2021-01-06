@@ -55,7 +55,7 @@ bigquery_setup_ui <- function(id) {
 #' BigQuery Setup Server
 #'
 #' @param id The Module namespace
-#' @param secrets_json Location of Google secrets json
+#' @param secrets_json Location of Google secrets json. Defaults to '/srv/shiny-server/.bq_client_id/client_secret.json' for Shiny Server installations.
 #'
 #' @return BigQuery connection variables and user information
 #' @export
@@ -76,7 +76,7 @@ bigquery_setup_ui <- function(id) {
 #' @importFrom tibble tibble enframe
 #' @importFrom tidyr unnest
 #' 
-bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBigQuery/client_secret.json') {
+bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.bq_client_id/client_secret.json') {
   moduleServer(
     id,
     function(input, output, session) {
@@ -127,22 +127,54 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
         req(params()$code) 
         google_info$is_authorized <- 'yes'
         })
+      ### Platform client_id path
+      secrets_json_default <- if(.Platform$OS.type == 'unix') {
+        '~/.bq_client_id/client_secret.json' 
+        } else {'$HOMEPATH$/.bq_client_id/client_secret.json'}
       
       ## OAuth Dance ----
       #### We can dance if we want to
       ### OAuth 2.0 Client ID using user supplied client_secrets.json
-      if(file.exists(secrets_json) & hostname != 'localhost') { 
-        ### Web Authorization using user supplied client_secrets.json
+      
+      #### Server Installs
+      if(hostname != 'localhost' & file.exists(secrets_json) ) { 
+        ### Web Authorization using user defined client_secrets.json. Always use path specified by user, if it exists.
         secrets <- jsonlite::fromJSON(txt = file(secrets_json))
         app <- oauth_app(appname = "shinyBigQuery",
                          key = secrets$web$client_id,
                          secret = secrets$web$client_secret,
                          redirect_uri = client_url
                          )
-        } else {
-          ### Installed Authorization using package client_secrets.json
-          app <- installed_app()
-          }
+        } else if(hostname != 'localhost' & file.exists('/srv/shiny-server/.bq_client_id/client_secret.json') ) {
+          ### Web Authorization using client_secrets.json in prescribed default location.
+          secrets <- jsonlite::fromJSON(txt = file('/srv/shiny-server/.bq_client_id/client_secret.json'))
+          app <- oauth_app(appname = "shinyBigQuery",
+                           key = secrets$web$client_id,
+                           secret = secrets$web$client_secret,
+                           redirect_uri = client_url
+                           )
+      #### Local Installs    
+        } else if(hostname == 'localhost' & file.exists(secrets_json) ) {
+          ### Installed Package Authorization using user defined client_secrets.json. Always use path specified by user, if it exists.
+          secrets <- jsonlite::fromJSON(txt = file(secrets_json))
+          app <- oauth_app(appname = "shinyBigQuery",
+                           key = secrets$installed$client_id,
+                           secret = secrets$installed$client_secret,
+                           redirect_uri = client_url
+                           )
+          } else if(hostname == 'localhost' & file.exists(secrets_json_default)) {
+            ### Installed Package Authorization using client_secrets.json in prescribed default location.
+            secrets <- jsonlite::fromJSON(txt = file(secrets_json_default))
+            app <- oauth_app(appname = "shinyBigQuery",
+                       key = secrets$installed$client_id,
+                       secret = secrets$installed$client_secret,
+                       redirect_uri = client_url
+                       )
+            } else {
+              ### Installed Package Authorization using package client_secrets.json
+              ### After exhausting all other options, use the credentials installed by the package.
+              app <- installed_app()
+              }
       
       ### Define Google as the endpoint (this one is canned)
       api <- oauth_endpoints("google")
@@ -205,9 +237,9 @@ bigquery_setup_server <- function(id, secrets_json = '/srv/shiny-server/.shinyBi
                                 solidHeader = F,
                                 HTML('To connect to a Google BigQuery database, please generate a Google OAuth2.0 Client ID and enable access the BigQuery API within your project:<br><br>
                                         <ul>
-                                             <li> <a href="https://cloud.google.com/docs/authentication/end-user">https://cloud.google.com/docs/authentication/end-user </a></li>
+                                             <li> <a href="https://developers.google.com/identity/protocols/oauth2/web-server" target="_blank" rel="noopener noreferrer">https://developers.google.com/identity/protocols/oauth2/web-server </a></li>
                                         </ul>
-                                     Download the client ID JSON as "client_secret.json" and copy it to "/srv/shiny_server/.shinyBigQuery". Then reload the application.'
+                                     Download the client ID JSON as "client_secret.json" and copy it to "/srv/shiny_server/.bq_client_id". Then reload the application.'
                                      ),
                                 br()
                                 ) 
