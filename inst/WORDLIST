@@ -1,9 +1,14 @@
+bigquery
 bq
+GCP
 httr
 json
+moduleName
+moduleType
 oauth
 OAuth
 shinyBigQuery’
 srv
 ui
 UI
+uiOutput
