@@ -7,9 +7,9 @@
 installed_app()
 }
 \value{
-An Invisible OAuth consumer application, produced by [httr::oauth_app()]
+An Invisible OAuth consumer application, produced by \code{\link[httr:oauth_app]{httr::oauth_app()}}
 }
 \description{
-Invisibly returns an OAuth app
+Invisibly returns an OAuth app.
 }
 \keyword{internal}
