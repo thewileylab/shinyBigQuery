@@ -5,6 +5,8 @@
 #' @export
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options
+#' 
+#' @return No return value, called to start the Shiny Application!
 run_app <- function(...) {
   with_golem_options(
     app = shinyApp(
