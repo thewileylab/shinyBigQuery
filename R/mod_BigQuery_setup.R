@@ -230,13 +230,12 @@ bigquery_setup_server <- function(id, secrets_json = NULL) {
       
       ## Google Client Secret Locations ----
         ### Golem client_id path
-        # secrets_json_golem <- get_golem_options('secrets_json')
         if ( !is.null(get_golem_options('secrets_json')) & safe_file.exists(get_golem_options('secrets_json')) ) {
           secrets_json_golem <- get_golem_options('secrets_json')
           } else {
             secrets_json_golem <- NULL
             }
-        ### Module param clint_id path
+        ### Module param client_id path
         if( !is.null(secrets_json) & safe_file.exists(secrets_json) ) {
           secrets_json_param <- secrets_json
           } else {
