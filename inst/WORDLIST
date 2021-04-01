@@ -7,6 +7,7 @@ moduleName
 moduleType
 oauth
 OAuth
+params
 shinyBigQuery’
 srv
 ui

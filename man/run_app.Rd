@@ -7,7 +7,10 @@
 run_app(...)
 }
 \arguments{
-\item{...}{A series of options to be used inside the app.}
+\item{...}{A series of options/params to be used inside the app including:
+\itemize{
+\item{secrets_json: A string, containing a file path to a Google OAuth 2.0 Client}
+}}
 }
 \value{
 No return value, called to start the Shiny Application!

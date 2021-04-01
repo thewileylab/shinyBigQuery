@@ -1,6 +1,9 @@
 #' Run the Shiny Application
 #'
-#' @param ... A series of options to be used inside the app.
+#' @param ... A series of options/params to be used inside the app including:
+#' \itemize{
+#' \item{secrets_json: A string, containing a file path to a Google OAuth 2.0 Client}
+#' }
 #'
 #' @export
 #' @importFrom shiny shinyApp
