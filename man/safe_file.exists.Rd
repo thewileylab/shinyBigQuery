@@ -17,3 +17,4 @@ with any input.
 A "safe" wrapper around \link[base:files]{base::file.exists} that returns a FALSE if no file
 path is supplied as an argument, instead of an error.
 }
+\keyword{internal}

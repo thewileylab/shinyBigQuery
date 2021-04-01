@@ -29,6 +29,8 @@ print.hidden_fn <- function(x, ...) {
 #' path is supplied as an argument, instead of an error.
 #'
 #' @param ... character vectors, containing file names or paths
+#' 
+#' @keywords internal
 #'
 #' @return Logical, true/false if file path is provided or NULL if not supplied
 #' with any input.
